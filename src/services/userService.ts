@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/auth';
 import Logger from '../utils/logger';
 import { MongoError } from 'mongodb';
+import { NotFound, Success } from '../utils/errorHandler';
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -42,14 +43,14 @@ export const login = async (req: Request, res: Response) => {
         const { email, password } = parseResult.data;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).send("User not found");
+            return NotFound(res, { data: null, meta: { code: 404, title: 'Not Found', message: 'User not found' } });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).send("Invalid password");
         }
         const token = generateToken(user._id);
-        res.status(200).send({ token });
+        Success(res, token);
     } catch (error) {
         res.status(500).send("Error logging in");
     }

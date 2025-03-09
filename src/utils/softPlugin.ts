@@ -30,7 +30,13 @@ export function softDeletePlugin<T extends SoftDeleteDocument>(schema: Schema<T>
         if (this.isNew) {
             const Model = this.constructor as any;
             const count = await Model.countDocuments();
-            this.uid = count + 1;
+            const lastUid = await Model.findOne().sort({ uid: -1 }).select('uid');
+            const lastUidGreaterThanCount = lastUid && lastUid.uid > count;
+            if (lastUid && lastUidGreaterThanCount) {
+                this.uid = lastUid.uid + 1;
+            } else {
+                this.uid = count + 1;
+            }
         }
         next();
     });

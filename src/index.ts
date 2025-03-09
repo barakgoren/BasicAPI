@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import Logger from './utils/logger';
+import cors from 'cors';
 
 dotenv.config(); // Load environment variables
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@cluster0.frzuroc.mongodb.net/API?retryWrites=true&w=majority`; // Updated connection string
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
